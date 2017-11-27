@@ -1,5 +1,5 @@
 import feedparser
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
@@ -8,34 +8,14 @@ rss_feeds = {'nba':'http://www.nba.com/rss/nba_rss.xml',
   'fox':'http://feeds.foxnews.com/foxnews/latest',
   'football':'http://feeds.feedburner.com/ChampionsLeagueFootballNews?format=xml'
 }
-@app.route("/")
-@app.route('/nba')
-def nba():
-    return get_news('nba')
-
-@app.route('/cnn')
-def cnn():
-    return get_news('cnn')
-
-@app.route('/football')
-def football():
-    return get_news('football')
-
-def get_news(publication):
+@app.route('/')
+@app.route("/<publication>")
+def get_news(publication='nba'):
     feed = feedparser.parse(rss_feeds[publication])
-    first_article = feed['entries'][0]
-    return """<html>
-      <body>
-        <h1>Headlines</h1>
-        <b>{0}</b><br />
-        <i>{1}</i><br />
+    return render_template('index.html',
+    articles = feed['entries'])
 
-    
-    <p>{2}</p><br />
-      </body>
-    </html>
-    """.format(first_article.get('title'),
-    first_article.get('date'),first_article.get('summary'))
+
 
 
 
