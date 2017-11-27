@@ -3,15 +3,30 @@ from flask import Flask
 
 app = Flask(__name__)
 
-nba_feeds = 'http://www.nba.com/rss/nba_rss.xml'
-
+rss_feeds = {'nba':'http://www.nba.com/rss/nba_rss.xml',
+  'cnn':'http://rss.cnn.com/rss/edition.rss',
+  'fox':'http://feeds.foxnews.com/foxnews/latest',
+  'football':'http://feeds.feedburner.com/ChampionsLeagueFootballNews?format=xml'
+}
 @app.route("/")
-def get_news():
-    feed = feedparser.parse(nba_feeds)
+@app.route('/nba')
+def nba():
+    return get_news('nba')
+
+@app.route('/cnn')
+def cnn():
+    return get_news('cnn')
+
+@app.route('/football')
+def football():
+    return get_news('football')
+
+def get_news(publication):
+    feed = feedparser.parse(rss_feeds[publication])
     first_article = feed['entries'][0]
     return """<html>
       <body>
-        <h1>NBA Headlines</h1>
+        <h1>Headlines</h1>
         <b>{0}</b><br />
         <i>{1}</i><br />
 
@@ -20,7 +35,7 @@ def get_news():
       </body>
     </html>
     """.format(first_article.get('title'),
-    first_article.get('date'),first_article.get('title_detail')['value'])
+    first_article.get('date'),first_article.get('summary'))
 
 
 
